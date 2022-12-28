@@ -68,10 +68,24 @@ public class PlayerController : MonoBehaviour
         shootingRay = new Ray(fpsCam.transform.position, fpsCam.transform.forward);
         Debug.DrawRay(fpsCam.transform.position, transform.forward * 1000, Color.red, 2);
         RaycastHit hit;
+        float accuracy;
+        ++GameManager.shotsFired;
         if (Physics.Raycast(shootingRay, out hit, 200f, targetLayerMask))
         {
             Destroy(hit.transform.gameObject);
+            Vector3 point = hit.point;
+            DistanceAndScore distanceAndScore = hit.transform.gameObject.GetComponent<DistanceAndScore>();
+            accuracy = distanceAndScore.CalculateAccuracy(point);
+            print("-----------------------HIT-----------------------");
+        } else
+        {
+            accuracy = 0;
         }
+        GameManager.globalAccuracy = (GameManager.globalAccuracy * (GameManager.shotsFired - 1) + accuracy) / GameManager.shotsFired;
+        print("Score: " + GameManager.score);
+        print("Accuracy: " + GameManager.globalAccuracy);
+        print("Last Shot Accuracy: " + accuracy);
+        
     }
 
     
