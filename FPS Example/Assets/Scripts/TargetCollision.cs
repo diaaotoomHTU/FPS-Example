@@ -37,11 +37,18 @@ public class TargetCollision : MonoBehaviour
         } else
         {
             this.transform.DORotate(new Vector3(0, 0, -90), 0.2f);
-            TargetReset targetReset = this.GetComponent<TargetReset>();
-            targetReset.Invoke("resetRotationAndTime", 2);
+            this.gameObject.layer = 9;
+            Invoke("resetRotationAndTime", 2);
         }
         this.accuracy = distanceAndScore.CalculateAccuracy(point);
         this.reactionTime = distanceAndScore.CalculateReactionTime(spawnedTime);
         
+    }
+
+    void resetRotationAndTime()
+    {
+        this.gameObject.layer = 8;
+        transform.DORotate(new Vector3(0, 0, 0), 0.2f);
+        spawnedTime = DateTime.Now;
     }
 }

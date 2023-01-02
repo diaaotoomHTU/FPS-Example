@@ -19,6 +19,7 @@ public class TargetReset : MonoBehaviour
 
     public void resetRotationAndTime()
     {
+        this.gameObject.layer = 9;
         transform.DORotate(new Vector3(0, 0, 0), 0.2f);
         this.GetComponent<TargetCollision>().spawnedTime = System.DateTime.Now;
     }
