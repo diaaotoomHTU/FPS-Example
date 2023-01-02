@@ -8,11 +8,20 @@ public class GameManager : MonoBehaviour
     public static int score = 0;
     public static int shotsFired = 0;
     public static float globalAccuracy = 0;
+    public static int ammo = 20;
     [SerializeField] GameObject target;
+    List<Vector3> positions = new List<Vector3>();
     // Start is called before the first frame update
     void Start()
     {
-        InvokeRepeating("SpawnTarget", 1, 3);
+        for (int i = -7; i < -3; ++i)
+        {
+            for (int j = 0; j < 2; ++j)
+            {
+                positions.Add(new Vector3(i * 2, j * - 2 - 10, 33));
+            }
+        }
+        Invoke("SpawnTarget", 1);
     }
 
     // Update is called once per frame
@@ -23,6 +32,14 @@ public class GameManager : MonoBehaviour
 
     void SpawnTarget()
     {
-        Instantiate(target, new Vector3(Random.Range(-7, -3) * 2,  Random.Range(0, 2) * -2 - 10, 33), target.transform.rotation);
+        int index = Random.Range(0, positions.Count);
+        Vector3 position = positions[index];
+        positions.RemoveAt(index);
+        Instantiate(target, position, target.transform.rotation);
+        if (positions.Count > 0)
+        {
+            print("Targets Left: " + positions.Count);
+            Invoke("SpawnTarget", 3);
+        }
     }
 }

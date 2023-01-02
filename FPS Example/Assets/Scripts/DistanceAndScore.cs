@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -47,8 +48,9 @@ public class DistanceAndScore : MonoBehaviour
         return accuracy;
     }
 
-    void updateScore()
+    public double CalculateReactionTime(DateTime timeAppeared)
     {
-
+        return (DateTime.Now - timeAppeared).TotalMilliseconds;
     }
+
 }

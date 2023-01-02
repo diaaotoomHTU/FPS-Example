@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,9 +12,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float speed;
     [SerializeField] float upwardsRotationLimit = -50f;
     [SerializeField] float downwardsRotationLimit = 30f;
-    // [SerializeField] Transform groundCheck;
-    // [SerializeField] LayerMask groundMask;
-    // float groundCheckRadius = 0.4f;
     const string mouseX = "Mouse X";
     const string mouseY = "Mouse Y";
     const string verticalMovement = "Vertical";
@@ -22,17 +21,17 @@ public class PlayerController : MonoBehaviour
     Vector2 currentRotation;
     CharacterController characterController;
     bool isGrounded;
-    // float jumpHeight = 50f;
-
     [SerializeField] Camera fpsCam;
-    int targetLayerMask = 1 << 6;
-    
+    int targetLayerMask = (1 << 6) | (1 << 7) | (1 << 8);
+    [SerializeField] Text ammo;
+
 
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
+        UnityEngine.Cursor.lockState = CursorLockMode.Locked;
         characterController = this.GetComponent<CharacterController>();
-        
+        UpdateAmmo updateAmmo = ammo.GetComponent<UpdateAmmo>();
+        updateAmmo.changeText();
     }
 
 
@@ -40,9 +39,12 @@ public class PlayerController : MonoBehaviour
     {
         MovePlayer();
         MoveCamera();
-        if (Input.GetKeyDown(KeyCode.Mouse0))
+        if (Input.GetKeyDown(KeyCode.Mouse0) && GameManager.ammo > 0)
         {
             Shoot();
+            --GameManager.ammo;
+            UpdateAmmo updateAmmo = ammo.GetComponent<UpdateAmmo>();
+            updateAmmo.changeText();
         }
     }
     void MoveCamera()
@@ -64,28 +66,44 @@ public class PlayerController : MonoBehaviour
 
     void Shoot()
     {
+        // Variables needed
         Ray shootingRay;
         shootingRay = new Ray(fpsCam.transform.position, fpsCam.transform.forward);
         Debug.DrawRay(fpsCam.transform.position, transform.forward * 1000, Color.red, 2);
         RaycastHit hit;
         float accuracy;
+        double reactionTime;
         ++GameManager.shotsFired;
+
+        // Shoot ray
         if (Physics.Raycast(shootingRay, out hit, 200f, targetLayerMask))
         {
-            Destroy(hit.transform.gameObject);
-            Vector3 point = hit.point;
-            DistanceAndScore distanceAndScore = hit.transform.gameObject.GetComponent<DistanceAndScore>();
-            accuracy = distanceAndScore.CalculateAccuracy(point);
-            print("-----------------------HIT-----------------------");
+            // Call targetHit depending on whether the target is small or big
+            TargetCollision targetCollision = hit.transform.gameObject.GetComponent<TargetCollision>();
+            targetCollision.targetHit(hit);
+            accuracy = targetCollision.accuracy;
+            reactionTime = targetCollision.reactionTime;
+
         } else
         {
+            print("-----------------------MISSED-----------------------");
             accuracy = 0;
+            reactionTime = 0;
         }
         GameManager.globalAccuracy = (GameManager.globalAccuracy * (GameManager.shotsFired - 1) + accuracy) / GameManager.shotsFired;
+        printStats(accuracy, reactionTime);
+    }
+
+    void printStats(float accuracy, double reactionTime)
+    {
         print("Score: " + GameManager.score);
-        print("Accuracy: " + GameManager.globalAccuracy);
-        print("Last Shot Accuracy: " + accuracy);
-        
+        print("Accuracy: " + GameManager.globalAccuracy + "%");
+        print("Last Shot Accuracy: " + accuracy + "%");
+        if (reactionTime != 0)
+        {
+            print("Reaction Time: " + reactionTime + "ms");
+        }
+        print("Shots Fired: " + GameManager.shotsFired);
     }
 
     
