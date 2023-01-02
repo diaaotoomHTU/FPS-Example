@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     CharacterController characterController;
     bool isGrounded;
     [SerializeField] Camera fpsCam;
-    int targetLayerMask = (1 << 6) | (1 << 7) | (1 << 8);
+    int targetLayerMask = (1 << 6) | (1 << 7) | (1 << 8) | (1 << 10);
     [SerializeField] Text ammo;
 
 
@@ -80,7 +80,7 @@ public class PlayerController : MonoBehaviour
         {
             // Call targetHit depending on whether the target is small or big
             TargetCollision targetCollision = hit.transform.gameObject.GetComponent<TargetCollision>();
-            targetCollision.targetHit(hit);
+            targetCollision.TargetHit(hit);
             accuracy = targetCollision.accuracy;
             reactionTime = targetCollision.reactionTime;
 
@@ -91,10 +91,10 @@ public class PlayerController : MonoBehaviour
             reactionTime = 0;
         }
         GameManager.globalAccuracy = (GameManager.globalAccuracy * (GameManager.shotsFired - 1) + accuracy) / GameManager.shotsFired;
-        printStats(accuracy, reactionTime);
+        PrintStats(accuracy, reactionTime);
     }
 
-    void printStats(float accuracy, double reactionTime)
+    void PrintStats(float accuracy, double reactionTime)
     {
         print("Score: " + GameManager.score);
         print("Accuracy: " + GameManager.globalAccuracy + "%");

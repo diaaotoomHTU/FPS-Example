@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     public static int ammo = 20;
     [SerializeField] GameObject target;
     List<Vector3> positions = new List<Vector3>();
+    public List<GameObject> flippingTargets = new List<GameObject>();
     // Start is called before the first frame update
     void Start()
     {
@@ -22,6 +23,7 @@ public class GameManager : MonoBehaviour
             }
         }
         Invoke("SpawnTarget", 1);
+        InvokeRepeating("ChooseFlippingTarget", 1, 2);
     }
 
     // Update is called once per frame
@@ -40,6 +42,15 @@ public class GameManager : MonoBehaviour
         {
             print("Targets Left: " + positions.Count);
             Invoke("SpawnTarget", 3);
+        }
+    }
+
+    void ChooseFlippingTarget()
+    {
+        if (flippingTargets.Count > 0)
+        {
+            int targetIndex = Random.Range(0, flippingTargets.Count);
+            flippingTargets[targetIndex].GetComponent<NormalFlippingMovement>().ResetRotationAndTime();
         }
     }
 }

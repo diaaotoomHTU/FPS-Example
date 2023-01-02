@@ -15,8 +15,9 @@ public class DistanceAndScore : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        bullseyeDistance = getDistanceBetweenPoints(bullseyePoint.position, bullseyeEnd.position);
-        completeDistance = getDistanceBetweenPoints(bullseyePoint.position, targetEdge.position);
+        
+        bullseyeDistance = Vector3.Distance(bullseyePoint.position, bullseyeEnd.position);
+        completeDistance = Vector3.Distance(bullseyePoint.position, targetEdge.position);
     }
 
     // Update is called once per frame
@@ -25,17 +26,9 @@ public class DistanceAndScore : MonoBehaviour
         
     }
 
-    float getDistanceBetweenPoints(Vector3 point1, Vector3 point2) 
-    {
-        float xDiff = point2.x - point1.x;
-        float zDiff = point2.z - point1.z;
-        float distance = Mathf.Sqrt(xDiff * xDiff + zDiff * zDiff);
-        return distance;
-    }
-
     public float CalculateAccuracy(Vector3 point)
     {
-        float distance = getDistanceBetweenPoints(bullseyePoint.position, point);
+        float distance = Vector3.Distance(bullseyePoint.position, point);
         float accuracy;
         if (distance <= bullseyeDistance)
         {

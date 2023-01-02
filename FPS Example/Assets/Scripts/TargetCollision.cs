@@ -11,10 +11,11 @@ public class TargetCollision : MonoBehaviour
     public DateTime spawnedTime = DateTime.Now;
     public float accuracy;
     public double reactionTime;
+    public bool shot = false;
     // Start is called before the first frame update
     void Start()
     {
-        
+        Debug.Log(Time.time);
     }
 
     // Update is called once per frame
@@ -23,32 +24,27 @@ public class TargetCollision : MonoBehaviour
        
     }
 
-    public void targetHit(RaycastHit hit)
+    public void TargetHit(RaycastHit hit)
     {
         print("-----------------------HIT-----------------------");
+        shot = true;
         Vector3 point = hit.point;
         DistanceAndScore distanceAndScore = this.transform.gameObject.GetComponent<DistanceAndScore>();
         if (this.transform.gameObject.layer == 6)
         {
             Destroy(this.transform.gameObject);
+            this.reactionTime = distanceAndScore.CalculateReactionTime(spawnedTime);
         } else if (this.transform.gameObject.layer == 7)
         {
             Instantiate(bulletImpact, hit.point + (-0.05f * this.transform.up), Quaternion.identity);
+            this.reactionTime = 0;
         } else
         {
-            this.transform.DORotate(new Vector3(0, 0, -90), 0.2f);
+            this.transform.DOLocalRotate(new Vector3(this.transform.rotation.eulerAngles.x, this.transform.rotation.eulerAngles.y, -90), 0.2f);
             this.gameObject.layer = 9;
-            Invoke("resetRotationAndTime", 2);
+            this.reactionTime = distanceAndScore.CalculateReactionTime(spawnedTime);
         }
         this.accuracy = distanceAndScore.CalculateAccuracy(point);
-        this.reactionTime = distanceAndScore.CalculateReactionTime(spawnedTime);
-        
     }
 
-    void resetRotationAndTime()
-    {
-        this.gameObject.layer = 8;
-        transform.DORotate(new Vector3(0, 0, 0), 0.2f);
-        spawnedTime = DateTime.Now;
-    }
 }
